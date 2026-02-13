@@ -23,7 +23,6 @@ import com.mrcrayfish.vehicle.client.screen.EditVehicleScreen;
 import com.mrcrayfish.vehicle.client.screen.FluidExtractorScreen;
 import com.mrcrayfish.vehicle.client.screen.FluidMixerScreen;
 import com.mrcrayfish.vehicle.client.screen.StorageScreen;
-import com.mrcrayfish.vehicle.client.screen.WorkstationScreen;
 import com.mrcrayfish.vehicle.entity.VehicleEntity;
 import com.mrcrayfish.vehicle.entity.VehicleProperties;
 import com.mrcrayfish.vehicle.init.ModBlocks;
@@ -111,7 +110,6 @@ public class ClientHandler
 
     private static void setupRenderLayers()
     {
-        RenderTypeLookup.setRenderLayer(ModBlocks.WORKSTATION.get(), RenderType.cutout());
         RenderTypeLookup.setRenderLayer(ModBlocks.FLUID_EXTRACTOR.get(), RenderType.cutout());
         RenderTypeLookup.setRenderLayer(ModBlocks.GAS_PUMP.get(), RenderType.cutout());
         RenderTypeLookup.setRenderLayer(ModFluids.FUELIUM.get(), RenderType.translucent());
@@ -197,7 +195,6 @@ public class ClientHandler
         ScreenManager.register(ModContainers.FLUID_EXTRACTOR.get(), FluidExtractorScreen::new);
         ScreenManager.register(ModContainers.FLUID_MIXER.get(), FluidMixerScreen::new);
         ScreenManager.register(ModContainers.EDIT_VEHICLE.get(), EditVehicleScreen::new);
-        ScreenManager.register(ModContainers.WORKSTATION.get(), WorkstationScreen::new);
         ScreenManager.register(ModContainers.STORAGE.get(), StorageScreen::new);
     }
 

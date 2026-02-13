@@ -12,6 +12,7 @@ import net.minecraft.world.World;
  */
 public class AluminumBoatEntity extends BoatEntity
 {
+
     public AluminumBoatEntity(EntityType<? extends AluminumBoatEntity> type, World worldIn)
     {
         super(type, worldIn);

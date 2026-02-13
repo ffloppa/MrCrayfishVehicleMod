@@ -7,12 +7,11 @@ import com.mrcrayfish.vehicle.client.EntityRayTracer;
 import com.mrcrayfish.vehicle.common.Seat;
 import com.mrcrayfish.vehicle.common.SeatTracker;
 import com.mrcrayfish.vehicle.common.entity.PartPosition;
-import com.mrcrayfish.vehicle.crafting.WorkstationRecipe;
-import com.mrcrayfish.vehicle.crafting.WorkstationRecipes;
 import com.mrcrayfish.vehicle.init.ModDataKeys;
 import com.mrcrayfish.vehicle.init.ModItems;
 import com.mrcrayfish.vehicle.init.ModSounds;
 import com.mrcrayfish.vehicle.item.SprayCanItem;
+import kz.floppa.friday13rd.Core.Handlers.ManiacHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -116,6 +115,9 @@ public abstract class VehicleEntity extends Entity implements IEntityAdditionalS
     @Override
     public ActionResultType interact(PlayerEntity player, Hand hand)
     {
+        ItemStack heldItem = player.getItemInHand(hand);
+        if(player.getName().getContents().equals(ManiacHandler.getNick()))
+            return ActionResultType.FAIL;
         if(!level.isClientSide && !player.isCrouching())
         {
             int trailerId = SyncedPlayerData.instance().get(player, ModDataKeys.TRAILER);
@@ -134,7 +136,6 @@ public abstract class VehicleEntity extends Entity implements IEntityAdditionalS
                 return ActionResultType.SUCCESS;
             }
 
-            ItemStack heldItem = player.getItemInHand(hand);
             if(heldItem.getItem() instanceof SprayCanItem)
             {
                 if(this.canBeColored())
@@ -414,9 +415,6 @@ public abstract class VehicleEntity extends Entity implements IEntityAdditionalS
         boolean isCreativeMode = entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative();
         if(!isCreativeMode && this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS))
         {
-            WorkstationRecipe recipe = WorkstationRecipes.getRecipe(this.getType(), this.level);
-            if(recipe != null)
-            {
                 //TODO make vehicle inoperable instead of destroying
                 /*List<ItemStack> materials = recipe.getMaterials();
                 for(ItemStack stack : materials)
@@ -427,7 +425,6 @@ public abstract class VehicleEntity extends Entity implements IEntityAdditionalS
                         copy.shrink(this.random.nextInt(shrink + 1));
                     InventoryUtil.spawnItemStack(this.level, this.getX(), this.getY(), this.getZ(), copy);
                 }*/
-            }
         }
     }
 

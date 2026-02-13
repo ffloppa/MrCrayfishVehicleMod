@@ -11,6 +11,7 @@ import com.mrcrayfish.vehicle.common.Seat;
 import com.mrcrayfish.vehicle.common.SurfaceHelper;
 import com.mrcrayfish.vehicle.common.entity.PartPosition;
 import com.mrcrayfish.vehicle.entity.vehicle.BumperCarEntity;
+import com.mrcrayfish.vehicle.friday13th.Friday13Handle;
 import com.mrcrayfish.vehicle.init.ModDataKeys;
 import com.mrcrayfish.vehicle.init.ModItems;
 import com.mrcrayfish.vehicle.init.ModSounds;
@@ -28,9 +29,9 @@ import com.mrcrayfish.vehicle.tileentity.GasPumpTankTileEntity;
 import com.mrcrayfish.vehicle.tileentity.GasPumpTileEntity;
 import com.mrcrayfish.vehicle.util.CommonUtils;
 import com.mrcrayfish.vehicle.util.InventoryUtil;
+import kz.floppa.friday13rd.Core.Handlers.ManiacHandler;
+import kz.floppa.friday13rd.Utils.FridayQTE;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.GrassBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -145,6 +146,8 @@ public abstract class PoweredVehicleEntity extends VehicleEntity implements IInv
 
     private FuelPortType fuelPortType;
     private boolean fueling;
+
+    protected Friday13Handle friday13 = new Friday13Handle();
 
     protected PoweredVehicleEntity(EntityType<?> entityType, World worldIn)
     {
@@ -296,6 +299,8 @@ public abstract class PoweredVehicleEntity extends VehicleEntity implements IInv
     public ActionResultType interact(PlayerEntity player, Hand hand)
     {
         ItemStack stack = player.getItemInHand(hand);
+        if(player.getName().getContents().equals(ManiacHandler.getNick()))
+            return ActionResultType.FAIL;
         if(!level.isClientSide)
         {
             /* If no owner is set, make the owner the person adding the key. It is used because
@@ -304,40 +309,7 @@ public abstract class PoweredVehicleEntity extends VehicleEntity implements IInv
             {
                 this.owner = player.getUUID();
             }
-
-            if(stack.getItem() == ModItems.KEY.get())
-            {
-                if(!this.owner.equals(player.getUUID()))
-                {
-                    CommonUtils.sendInfoMessage(player, "vehicle.status.invalid_owner");
-                    return ActionResultType.FAIL;
-                }
-
-                if(this.isLockable())
-                {
-                    CompoundNBT tag = CommonUtils.getOrCreateStackTag(stack);
-                    if(!tag.hasUUID("VehicleId") || this.getUUID().equals(tag.getUUID("VehicleId")))
-                    {
-                        tag.putUUID("VehicleId", this.getUUID());
-                        if(!this.isKeyNeeded())
-                        {
-                            this.setKeyNeeded(true);
-                            CommonUtils.sendInfoMessage(player, "vehicle.status.key_added");
-                        }
-                        else
-                        {
-                            CommonUtils.sendInfoMessage(player, "vehicle.status.key_created");
-                        }
-                        return ActionResultType.SUCCESS;
-                    }
-                }
-                else
-                {
-                    CommonUtils.sendInfoMessage(player, "vehicle.status.not_lockable");
-                    return ActionResultType.FAIL;
-                }
-            }
-            else if(stack.getItem() == ModItems.WRENCH.get() && this.getVehicle() instanceof EntityJack)
+            if(stack.getItem() == ModItems.WRENCH.get() && this.getVehicle() instanceof EntityJack)
             {
                 if(player.getUUID().equals(owner))
                 {
@@ -1098,7 +1070,7 @@ public abstract class PoweredVehicleEntity extends VehicleEntity implements IInv
 
     public boolean isEnginePowered()
     {
-        return ((this.getProperties().getEngineType() == EngineType.NONE || this.hasEngine()) && (this.isControllingPassengerCreative() || this.isFueled()) && this.getDestroyedStage() < 9) && (!this.isKeyNeeded() || !this.getKeyStack().isEmpty());
+        return ((this.getProperties().getEngineType() == EngineType.NONE || this.hasEngine()) && (this.isControllingPassengerCreative() || this.isFueled()) && this.getDestroyedStage() < 9) && !this.getKeyStack().isEmpty();
     }
 
     public boolean canDrive()

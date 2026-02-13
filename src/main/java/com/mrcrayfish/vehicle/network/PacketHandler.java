@@ -35,7 +35,6 @@ public class PacketHandler
         register(MessageFuelVehicle.class, new MessageFuelVehicle());
         register(MessageInteractKey.class, new MessageInteractKey());
         register(MessageAltitude.class, new MessageAltitude());
-        register(MessageCraftVehicle.class, new MessageCraftVehicle());
         register(MessageHitchTrailer.class, new MessageHitchTrailer());
         register(MessageSyncInventory.class, new MessageSyncInventory());
         register(MessageOpenStorage.class, new MessageOpenStorage());

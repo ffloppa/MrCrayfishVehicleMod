@@ -43,6 +43,7 @@ public class ModSounds
     public static final RegistryObject<SoundEvent> ITEM_JERRY_CAN_LIQUID_GLUG = register("item.jerry_can.liquid_glug");
     public static final RegistryObject<SoundEvent> ITEM_SPRAY_CAN_SHAKE = register("item.spray_can.shake");
     public static final RegistryObject<SoundEvent> ITEM_SPRAY_CAN_SPRAY = register("item.spray_can.spray");
+    public static final RegistryObject<SoundEvent> CAR_STARTING = register("car_starting");
 
     private static RegistryObject<SoundEvent> register(String id)
     {

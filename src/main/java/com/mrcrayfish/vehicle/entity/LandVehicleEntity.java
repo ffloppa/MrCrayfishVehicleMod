@@ -4,18 +4,27 @@ import com.mrcrayfish.vehicle.client.VehicleHelper;
 import com.mrcrayfish.vehicle.common.entity.PartPosition;
 import com.mrcrayfish.vehicle.network.PacketHandler;
 import com.mrcrayfish.vehicle.network.message.MessageDrift;
+import kz.floppa.friday13rd.Utils.FridayQTE;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: MrCrayfish
@@ -37,6 +46,8 @@ public abstract class LandVehicleEntity extends PoweredVehicleEntity
     @OnlyIn(Dist.CLIENT)
     public float prevRearWheelRotation;
 
+    protected FridayQTE qte = new FridayQTE();
+
     public LandVehicleEntity(EntityType<?> entityType, World worldIn)
     {
         super(entityType, worldIn);
@@ -47,6 +58,30 @@ public abstract class LandVehicleEntity extends PoweredVehicleEntity
     {
         super.defineSynchedData();
         this.entityData.define(DRIFTING, false);
+    }
+
+    @Override
+    public ActionResultType interact(PlayerEntity player, Hand hand) {
+        if(!player.level.isClientSide()) {
+            qte.activate(player,this, () -> {
+                friday13.putInCar(this,player,hand); return true;
+            });
+            if (this.canRide(player) && this.canDrive()) {
+                int seatIndex = this.seatTracker.getClosestAvailableSeatToPlayer(player);
+                if (seatIndex != -1) {
+                    if (player.startRiding(this)) {
+                        this.getSeatTracker().setSeatIndex(seatIndex, player.getUUID());
+                    }
+                }
+                return ActionResultType.SUCCESS;
+            }
+        }
+        return ActionResultType.FAIL;
+    }
+
+    @Override
+    public void tick() {
+        qte.onTick();
     }
 
     @Override

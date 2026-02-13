@@ -1,13 +1,13 @@
 package com.mrcrayfish.vehicle.item;
 
 import com.mrcrayfish.vehicle.common.VehicleRegistry;
-import com.mrcrayfish.vehicle.entity.EngineTier;
 import com.mrcrayfish.vehicle.entity.IEngineTier;
 import com.mrcrayfish.vehicle.entity.IEngineType;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -33,6 +33,11 @@ public class EngineItem extends PartItem
         VehicleRegistry.registerEngine(type, tier, this);
         this.type = type;
         this.tier = tier;
+    }
+
+    @Override
+    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
+        return super.onItemUseFirst(stack, context);
     }
 
     public IEngineType getEngineType()

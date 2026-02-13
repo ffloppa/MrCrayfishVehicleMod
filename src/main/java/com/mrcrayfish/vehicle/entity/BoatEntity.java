@@ -1,8 +1,12 @@
 package com.mrcrayfish.vehicle.entity;
 
+import kz.floppa.friday13rd.Utils.FridayQTE;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -20,6 +24,8 @@ public abstract class BoatEntity extends PoweredVehicleEntity
     protected State previousState;
     private double waterLevel;
 
+    protected FridayQTE qte = new FridayQTE();
+
     public BoatEntity(EntityType<?> entityType, World worldIn)
     {
         super(entityType, worldIn);
@@ -30,6 +36,31 @@ public abstract class BoatEntity extends PoweredVehicleEntity
     public boolean canChangeWheels()
     {
         return false;
+    }
+
+    @Override
+    public ActionResultType interact(PlayerEntity player, Hand hand) {
+        if(!player.level.isClientSide()) {
+            qte.activate(player,this, () -> {
+                friday13.putInBoat(this,player,hand); return true;
+            });
+            if (this.canRide(player) && this.canDrive()) {
+                int seatIndex = this.seatTracker.getClosestAvailableSeatToPlayer(player);
+                if (seatIndex != -1) {
+                    if (player.startRiding(this)) {
+                        this.getSeatTracker().setSeatIndex(seatIndex, player.getUUID());
+                    }
+                }
+                return ActionResultType.SUCCESS;
+            }
+            return ActionResultType.PASS;
+        }
+        return ActionResultType.FAIL;
+    }
+
+    @Override
+    public void tick() {
+        qte.onTick();
     }
 
     @Override

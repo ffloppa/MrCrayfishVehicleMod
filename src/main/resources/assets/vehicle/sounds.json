@@ -85,5 +85,8 @@
     },
     "item.spray_can.spray": {
         "sounds": [ {"name": "vehicle:item/spray_can/spray"}]
+    },
+    "car_starting": {
+        "sounds": [ {"name": "vehicle:car_starting"}]
     }
 }

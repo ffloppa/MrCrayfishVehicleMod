@@ -3,15 +3,26 @@ import groovy.json.JsonSlurper
 
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven {
+            name = 'MinecraftForge'
+            url = 'https://maven.minecraftforge.net/'
+        }
+        maven { url = 'https://maven.parchmentmc.org' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6+', changing: true
+        classpath group: 'org.parchmentmc.librarian.forgegradle', name: 'org.parchmentmc.librarian.forgegradle.gradle.plugin', version: '1+', changing: true
     }
 }
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = "0.45.2-1.16.5"
@@ -23,7 +34,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 minecraft {
-    mappings channel: "official", version: "1.16.5"
+    mappings channel: "parchment", version: "2022.03.06-1.16.5"
 
     runs {
         client {
@@ -76,9 +87,12 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.0'
 
-    compile fg.deobf('curse.maven:obfuscate-289380:3336021')
-    compile fg.deobf('curse.maven:controllable-317269:3335987')
-    compile fg.deobf('curse.maven:configured-457570:3340535')
+    implementation fg.deobf('curse.maven:obfuscate-289380:3336021')
+    shadow fg.deobf('curse.maven:obfuscate-289380:3336021')
+    implementation fg.deobf('curse.maven:controllable-317269:3335987')
+    implementation fg.deobf('curse.maven:configured-457570:3340535')
+    implementation 'net.minecraftforge:accesstransformers:3.0.1'
+    implementation files("libs/friday13rd-0.9.jar")
 }
 
 processResources {
@@ -90,6 +104,7 @@ processResources {
 }
 
 jar {
+    archiveClassifier = 'slim'
     manifest {
         attributes([
             "Specification-Title": "Vehicle Mod",
@@ -101,6 +116,7 @@ jar {
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+    finalizedBy 'reobfJar'
 }
 
 def reobfFile = file("$buildDir/reobfJar/output.jar")
@@ -119,4 +135,37 @@ publishing {
             url "file://C:/dev/maven/mcmodsrepo"
         }
     }
+}
+
+shadowJar {
+    // Указываем, какие конфигурации зависимостей включать
+    configurations = [project.configurations.shadow]
+
+    // Убираем классификатор, чтобы JAR был основным артефактом
+    archiveClassifier = ''
+
+    // Исключаем конкретную зависимость
+    dependencies {
+        exclude(dependency('net.java.dev.jna:jna:4.4.0'))
+    }
+
+    // Исключаем ненужные файлы
+    exclude 'META-INF/maven/**'
+    exclude 'META-INF/services/**'
+}
+
+// Конфигурация reobfuscation
+reobf {
+    shadowJar {}
+    jar {}
+}
+
+// Настройка зависимостей задач
+tasks.named('reobfJar') {
+    dependsOn shadowJar
+    mustRunAfter shadowJar
+}
+
+tasks.build {
+    dependsOn reobf
 }

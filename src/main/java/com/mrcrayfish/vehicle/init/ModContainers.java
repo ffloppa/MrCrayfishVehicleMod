@@ -7,10 +7,8 @@ import com.mrcrayfish.vehicle.inventory.container.EditVehicleContainer;
 import com.mrcrayfish.vehicle.inventory.container.FluidExtractorContainer;
 import com.mrcrayfish.vehicle.inventory.container.FluidMixerContainer;
 import com.mrcrayfish.vehicle.inventory.container.StorageContainer;
-import com.mrcrayfish.vehicle.inventory.container.WorkstationContainer;
 import com.mrcrayfish.vehicle.tileentity.FluidExtractorTileEntity;
 import com.mrcrayfish.vehicle.tileentity.FluidMixerTileEntity;
-import com.mrcrayfish.vehicle.tileentity.WorkstationTileEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.fml.RegistryObject;
@@ -36,10 +34,6 @@ public class ModContainers
     public static final RegistryObject<ContainerType<EditVehicleContainer>> EDIT_VEHICLE = register("edit_vehicle", (IContainerFactory<EditVehicleContainer>) (windowId, playerInventory, data) -> {
         PoweredVehicleEntity entity = (PoweredVehicleEntity) playerInventory.player.level.getEntity(data.readInt());
         return new EditVehicleContainer(windowId, entity.getVehicleInventory(), entity, playerInventory.player, playerInventory);
-    });
-    public static final RegistryObject<ContainerType<WorkstationContainer>> WORKSTATION = register("workstation", (IContainerFactory<WorkstationContainer>) (windowId, playerInventory, data) -> {
-        WorkstationTileEntity workstation = (WorkstationTileEntity) playerInventory.player.level.getBlockEntity(data.readBlockPos());
-        return new WorkstationContainer(windowId, playerInventory, workstation);
     });
     public static final RegistryObject<ContainerType<StorageContainer>> STORAGE = register("storage", (IContainerFactory<StorageContainer>) (windowId, playerInventory, data) -> {
         IStorage storage = (IStorage) playerInventory.player.level.getEntity(data.readVarInt());
